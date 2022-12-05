@@ -54,6 +54,10 @@ export const authService = {
         }
 
     },
+    async passwordRecovery (email: string) {
+        let newConfirmationCode = v4()
+        await emailService.passwordRecovery(email, 'password recovery', newConfirmationCode)
+    },
     async _generateHash(password: string) {
         return await bcrypt.hash(password, 10)
     },

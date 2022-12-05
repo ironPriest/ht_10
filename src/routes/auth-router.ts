@@ -176,6 +176,16 @@ authRouter.post('/registration-email-resending',
         return res.sendStatus(204)
     })
 
+authRouter.post(
+    '/password-recovery',
+    emailValidation,
+    inputValidationMiddleware,
+    rateLimiter,
+    async (req: Request, res: Response) => {
+        await authService.passwordRecovery(req.body.email)
+        return res.sendStatus(204)
+    })
+
 authRouter.post('/logout',async (req: Request, res: Response) => {
 
         const refreshToken = req.cookies.refreshToken
