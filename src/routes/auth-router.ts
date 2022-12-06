@@ -193,8 +193,8 @@ authRouter.post(
 authRouter.post(
     '/new-password',
     newPasswordValidation,
-    inputValidationMiddleware,
     rateLimiter,
+    inputValidationMiddleware,
     async (req: Request, res: Response) => {
 
         let user = await usersService.findByEmail(req.body.email)
