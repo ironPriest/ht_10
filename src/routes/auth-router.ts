@@ -32,6 +32,10 @@ const emailValidation = body('email')
     .isString()
     .matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
 
+const newPasswordValidation = body('newPassword')
+    .isLength({min: 6})
+    .isLength({max: 20})
+
 const doubleLoginValidation = body('loginOrEmail').custom(async (loginOrEmail,) => {
     const user = await usersService.findByLoginOrEmail(loginOrEmail)
     if (user) {
@@ -188,6 +192,7 @@ authRouter.post(
 
 authRouter.post(
     '/new-password',
+    newPasswordValidation,
     inputValidationMiddleware,
     rateLimiter,
     async (req: Request, res: Response) => {
