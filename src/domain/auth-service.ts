@@ -6,6 +6,7 @@ import {v4} from "uuid";
 import add from "date-fns/add"
 import {emailConfirmationRepository} from "../repositories/emailconfirmation-repository";
 import {emailService} from "./email-service";
+import {recoveryCodesRepository} from "../repositories/recovery-codes-repository";
 
 export const authService = {
     async createUser(login: string, password: string, email: string) {
@@ -55,8 +56,12 @@ export const authService = {
 
     },
     async passwordRecovery (email: string) {
-        let newConfirmationCode = v4()
-        await emailService.passwordRecovery(email, 'password recovery', newConfirmationCode)
+        let recoveryCode = v4()
+        await recoveryCodesRepository.create({
+            _id: new ObjectId(),
+            email,
+            recoveryCode})
+        await emailService.passwordRecovery(email, 'password recovery', recoveryCode)
     },
     async newPassword (userId: string, newPassword: string) {
         const newPasswordHash = await this._generateHash(newPassword)

@@ -53,3 +53,7 @@ export type TimeStampType = WithId<{
     ip: string
     timeStamp: Date
 }>
+export type RecoveryCodeType = WithId<{
+    email: string
+    recoveryCode: string
+}>

@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {DeviceAuthSessionType, TokenDBType} from "../types/types";
+import {DeviceAuthSessionType, RecoveryCodeType, TokenDBType} from "../types/types";
 import {authService} from "../domain/auth-service";
 import {jwtUtility} from "../application/jwt-utility";
 import {usersService} from "../domain/users-service";
@@ -9,6 +9,7 @@ import {deviceAuthSessionsService} from "../domain/device-auth-sessions-service"
 import {inputValidationMiddleware, rateLimiter} from "../middlewares/input-validation-middleware";
 import {body, header} from "express-validator";
 import {bearerAuthMiddleware} from "../middlewares/bearer-auth-middleware";
+import {recoveryCodesRepository} from "../repositories/recovery-codes-repository";
 
 export const authRouter = Router({})
 
@@ -72,6 +73,12 @@ const doubleResendingValidation = body('email').custom(async (email,) => {
     } else {
         throw new Error('no such email')
     }
+})
+
+const recoveryCodeValidation = body('recoveryCode').custom(async (recoveryCode, ) => {
+    const recoveryCodeEntity = await recoveryCodesRepository.findByRecoveryCode(recoveryCode)
+    if(!recoveryCodeEntity) throw new Error('bad recovery code')
+    return true
 })
 
 authRouter.post('/login',
@@ -193,8 +200,9 @@ authRouter.post(
 authRouter.post(
     '/new-password',
     newPasswordValidation,
-    rateLimiter,
+    recoveryCodeValidation,
     inputValidationMiddleware,
+    rateLimiter,
     async (req: Request, res: Response) => {
 
         let user = await usersService.findByEmail(req.body.email)
