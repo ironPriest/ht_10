@@ -186,6 +186,19 @@ authRouter.post(
         return res.sendStatus(204)
     })
 
+authRouter.post(
+    '/new-password',
+    inputValidationMiddleware,
+    rateLimiter,
+    async (req: Request, res: Response) => {
+
+        let user = await usersService.findByEmail(req.body.email)
+        if (!user) return res.sendStatus(204)
+
+        await authService.newPassword(user.id, req.body.newPassword)
+        return res.sendStatus(204)
+    })
+
 authRouter.post('/logout',async (req: Request, res: Response) => {
 
         const refreshToken = req.cookies.refreshToken

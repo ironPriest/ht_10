@@ -11,6 +11,10 @@ export const usersRepository = {
         }
         return user
     },
+    async newPassword(id: string, passwordHash: string) {
+        let res = await usersCollection.updateOne({id}, {$set: {passwordHash}})
+        return res.matchedCount === 1
+    },
     async findByLoginOrEmail(loginOrEmail: string) {
         return await usersCollection.findOne({ $or: [{email: loginOrEmail}, {login: loginOrEmail}]})
     },
