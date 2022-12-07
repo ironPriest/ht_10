@@ -84,7 +84,9 @@ const recoveryCodeValidation = body('recoveryCode').custom(async (recoveryCode, 
 authRouter.post('/login',
     rateLimiter,
     async (req: Request, res: Response) => {
+
         const user = await authService.checkCredentials(req.body.loginOrEmail, req.body.password)
+        console.log('user',user)
         if (!user) return res.sendStatus(401)
         const userId = user._id
 
@@ -205,8 +207,12 @@ authRouter.post(
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
 
-        let user = await usersService.findByEmail(req.body.email)
-        if (!user) return res.sendStatus(204)
+        let recoveryCodeEntity =  await recoveryCodesRepository.findByRecoveryCode(req.body.recoveryCode)
+        if(!recoveryCodeEntity) return res.sendStatus(404)
+
+        let user = await usersService.findByEmail(recoveryCodeEntity.email)
+        console.log('user /new-password',user)
+        if (!user) return res.sendStatus(404)
 
         await authService.newPassword(user.id, req.body.newPassword)
         return res.sendStatus(204)

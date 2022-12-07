@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import {usersRepository} from "../repositories/users-repository";
-import {UserDBType, EmailConfirmationDBType} from "../types/types";
+import {EmailConfirmationDBType, UserDBType} from "../types/types";
 import {ObjectId} from "mongodb";
 import {v4} from "uuid";
 import add from "date-fns/add"
@@ -37,13 +37,13 @@ export const authService = {
             emailConformation.confirmationCode)
         return creationResult
     },
-    async confirm (code: string) {
+    async confirm(code: string) {
         let confirmation = await emailConfirmationRepository.findByCode(code)
         if (confirmation) {
             await emailConfirmationRepository.updateStatus(confirmation.userId)
         }
     },
-    async confirmationResend (email: string) {
+    async confirmationResend(email: string) {
         let user: UserDBType | null = await usersRepository.findByEmail(email)
         if (user) {
             let userId = user.id
@@ -55,21 +55,23 @@ export const authService = {
         }
 
     },
-    async passwordRecovery (email: string) {
+    async passwordRecovery(email: string) {
         let recoveryCode = v4()
         await recoveryCodesRepository.create({
             _id: new ObjectId(),
             email,
-            recoveryCode})
+            recoveryCode
+        })
         await emailService.passwordRecovery(email, 'password recovery', recoveryCode)
     },
-    async newPassword (userId: string, newPassword: string) {
+    async newPassword(userId: string, newPassword: string) {
         const newPasswordHash = await this._generateHash(newPassword)
         return await usersRepository.newPassword(userId, newPasswordHash)
     },
     async _generateHash(password: string) {
         return await bcrypt.hash(password, 10)
     },
+
     async checkCredentials(loginOrEmail: string, password: string) {
 
         const user = await usersRepository.findByLoginOrEmail(loginOrEmail)
