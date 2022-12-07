@@ -14,5 +14,8 @@ export const blacktockensRepository = {
         } else {
             return null
         }
+    },
+    async deleteAll() {
+        await blacktockensCollection.deleteMany({})
     }
 }

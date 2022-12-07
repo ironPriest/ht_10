@@ -17,5 +17,8 @@ export const emailConfirmationRepository = {
     },
     async findByUserId(userId: string) {
         return await emailConfirmationsCollection.findOne({userId: userId})
+    },
+    async deleteAll() {
+        await emailConfirmationsCollection.deleteMany({})
     }
 }

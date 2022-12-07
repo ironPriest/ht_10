@@ -7,5 +7,8 @@ export const recoveryCodesRepository = {
     },
     async findByRecoveryCode(recoveryCode: string): Promise<RecoveryCodeType | null> {
         return await recoveryCodesCollection.findOne({recoveryCode})
+    },
+    async deleteAll() {
+        await recoveryCodesCollection.deleteMany({})
     }
 }

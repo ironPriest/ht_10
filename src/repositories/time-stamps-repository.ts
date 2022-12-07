@@ -11,5 +11,8 @@ export const timeStampsRepository = {
     },
     async cleanStamps(route: string, ip: string, timeStamp: Date) {
         await timeStampsCollection.deleteMany({route, ip, timeStamp: {$lt: sub(timeStamp, {seconds: 10})}})
+    },
+    async deleteAll() {
+        await timeStampsCollection.deleteMany({})
     }
 }
