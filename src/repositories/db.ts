@@ -13,6 +13,7 @@ import {
 } from '../types/types'
 
 const mongoUri = process.env.mongoURI || "mongodb://0.0.0.0:27017"
+const mongoForMongooseUri = 'mongodb+srv://andrei_shylovich:tDEU6uF8SedAaKvy@cluster0.huoctrk.mongodb.net/testDB?retryWrites=true&w=majority'
 
 export const client = new MongoClient(mongoUri)
 
@@ -41,7 +42,7 @@ export async function runDb() {
     try {
         // Connect the client to the server
         await client.connect()
-        await mongoose.connect(mongoUri + "/" + dbName)
+        await mongoose.connect(mongoForMongooseUri)
 
         console.log("Connected successfully to mongo server")
 
