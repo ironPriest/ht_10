@@ -2,7 +2,7 @@ import express from 'express'
 import {Request, Response} from "express";
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import {bloggersRouter} from "./routes/bloggers-router";
+import {blogsRouter} from "./routes/blogs-router";
 import {postsRouter} from "./routes/posts-router";
 import {usersRouter} from "./routes/users-router";
 import {authRouter} from "./routes/auth-router";
@@ -23,7 +23,7 @@ app.use(cookieParser())
 app.get('/', (req: Request, res: Response) => {
     res.send(':0')
 })
-app.use('/blogs', bloggersRouter)
+app.use('/blogs', blogsRouter)
 app.use('/posts', postsRouter)
 app.use('/users', usersRouter)
 app.use('/auth', authRouter)

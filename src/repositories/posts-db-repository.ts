@@ -1,5 +1,5 @@
-import {postDBType, bloggerDBType} from "../types/types";
-import {bloggersCollection, postsCollection} from "./db";
+import {postDBType, BlogType} from "../types/types";
+import {BlogModel, postsCollection} from "./db";
 import {ObjectId} from "mongodb";
 import {v4} from "uuid";
 
@@ -45,9 +45,9 @@ export const postsRepository = {
         shortDescription: string,
         content: string,
         blogId: string): Promise<postDBType | undefined> {
-            let result = await bloggersCollection.find({id: blogId}).count()
+            let result = await BlogModel.find({id: blogId}).count()
             if (result === 1) {
-                const blogger: bloggerDBType | null = await bloggersCollection.findOne({id: blogId})
+                const blogger: BlogType | null = await BlogModel.findOne({id: blogId})
                 let newPost: postDBType
                 await postsCollection.insertOne( newPost = {
                     _id: new ObjectId(),
@@ -72,7 +72,7 @@ export const postsRepository = {
         bloggerId: string): Promise<number> {
         let result = await postsCollection.find({id: postId}).count()
         if (result === 1) {
-            let result = await bloggersCollection.find({id: bloggerId}).count()
+            let result = await BlogModel.find({id: bloggerId}).count()
             if (result === 1) {
                 await postsCollection.updateOne({id: postId}, {$set: {
                     title: title,

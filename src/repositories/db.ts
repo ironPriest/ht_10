@@ -1,6 +1,7 @@
 import {MongoClient} from 'mongodb'
+import mongoose from 'mongoose'
 import {
-    bloggerDBType,
+    BlogType,
     postDBType,
     UserDBType,
     CommentDBType,
@@ -13,11 +14,11 @@ import {
 
 const mongoUri = process.env.mongoURI || "mongodb://0.0.0.0:27017"
 
-export const client = new MongoClient(mongoUri);
+export const client = new MongoClient(mongoUri)
 
-let db = client.db("testDB")
+let dbName = "testDB"
+let db = client.db(dbName)
 
-export const bloggersCollection = db.collection<bloggerDBType>('bloggers')
 export const postsCollection = db.collection<postDBType>('posts')
 export const usersCollection = db.collection<UserDBType>('users')
 export const commentsCollection = db.collection<CommentDBType>('comments')
@@ -27,16 +28,27 @@ export const deviceAuthSessionsCollection = db.collection<DeviceAuthSessionType>
 export const timeStampsCollection = db.collection<TimeStampType>('timeStamps')
 export const recoveryCodesCollection = db.collection<RecoveryCodeType>('recoveryCodes')
 
+const blogSchema = new mongoose.Schema<BlogType>({
+    id: String,
+    name: String,
+    websiteUrl: String,
+    description: String,
+    createdAt: Date
+})
+export const BlogModel = mongoose.model('blogs', blogSchema)
+
 export async function runDb() {
     try {
-        console.log(mongoUri)
         // Connect the client to the server
-        await client.connect();
-        console.log("Connected successfully to mongo server");
+        await client.connect()
+        await mongoose.connect(mongoUri + "/" + dbName)
+
+        console.log("Connected successfully to mongo server")
 
     } catch {
-        console.log("Can't connect to db");
+        console.log("Can't connect to db")
         // Ensures that the client will close when you finish/error
-        await client.close();
+        await client.close()
+        await mongoose.disconnect()
     }
 }

@@ -1,8 +1,8 @@
-import {bloggerDBType} from "../types/types";
-import {bloggersCollection} from "./db";
+import {BlogType} from "../types/types";
+import {BlogModel} from "./db";
 
-export const bloggersRepository = {
-    async getBloggers(
+export const blogsRepository = {
+    async getBlogs(
             searchTerm: string | undefined,
             pageNumber: number,
             pageSize: number,
@@ -12,7 +12,7 @@ export const bloggersRepository = {
         if (searchTerm) {
             filter.name = {$regex: searchTerm, $options: 'i'}
         }
-        let totalCount = await bloggersCollection.count(filter)
+        let totalCount = await BlogModel.count(filter)
         let pageCount = Math.ceil( +totalCount / pageSize)
         const sortFilter: any = {}
         switch (sortDirection) {
@@ -26,30 +26,30 @@ export const bloggersRepository = {
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": totalCount,
-            "items": await bloggersCollection
+            "items": await BlogModel
                 .find(filter, {projection:{_id: 0}})
                 .sort(sortFilter)
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
-                .toArray()
+                .lean()
         }
     },
-    async getBloggerById(bloggerId: string): Promise<bloggerDBType | null> {
-        return await bloggersCollection.findOne({id: bloggerId})
+    async getBlogById(blogId: string): Promise<BlogType | null> {
+        return BlogModel.findOne({id: blogId});
     },
-    async createBlogger(newBlogger: bloggerDBType): Promise<bloggerDBType> {
-            await bloggersCollection.insertOne(newBlogger)
-            return newBlogger
+    async createBlog(newBlog: BlogType): Promise<BlogType> {
+            await BlogModel.create(newBlog)
+            return newBlog
     },
-    async updateBlogger(bloggerId: string, name: string, youtubeUrl: string): Promise<boolean> {
-        let result = await bloggersCollection.updateOne({id: bloggerId}, {$set: {name: name, youtubeUrl: youtubeUrl}})
+    async updateBlog(blogId: string, name: string, websiteUrl: string): Promise<boolean> {
+        let result = await BlogModel.updateOne({id: blogId}, {$set: {name, websiteUrl}})
         return result.matchedCount === 1
     },
-    async deleteBlogger(bloggerId: string): Promise<boolean> {
-        let result = await bloggersCollection.deleteOne({id: bloggerId})
+    async deleteBlog(blogId: string): Promise<boolean> {
+        let result = await BlogModel.deleteOne({id: blogId})
         return result.deletedCount === 1
     },
     async deleteAll() {
-        await bloggersCollection.deleteMany({})
+        await BlogModel.deleteMany({})
     }
 }

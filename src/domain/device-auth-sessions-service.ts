@@ -1,4 +1,4 @@
-import {bloggerDBType, DeviceAuthSessionType} from "../types/types";
+import {DeviceAuthSessionType} from "../types/types";
 import {ObjectId} from "mongodb";
 import {v4} from "uuid";
 import add from "date-fns/add";

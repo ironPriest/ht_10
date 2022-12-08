@@ -1,23 +1,18 @@
 import {Request, Response, Router} from "express";
-import {bloggersService} from "../domain/bloggers-service";
+import {blogsService} from "../domain/blogs-service";
 import {body, param} from "express-validator";
 import {
     inputValidationMiddleware,
     requestsCounterMiddleware
 } from "../middlewares/input-validation-middleware";
 import {authMiddleware} from "../middlewares/auth-middleware";
-import {bloggerDBType} from "../types/types";
 import {postsService} from "../domain/posts-service";
 import {contentValidation, descValidation, titleValidation} from "./posts-router";
-import {bloggersRepository} from "../repositories/bloggers-db-repository";
-import {bearerAuthMiddleware} from "../middlewares/bearer-auth-middleware";
-//import {ipCheckMiddleware} from "../middlewares/ip-check-middleware";
 
-export const bloggersRouter = Router({})
+export const blogsRouter = Router({})
 
-//bloggersRouter.use(ipCheckMiddleware)
-bloggersRouter.use(requestsCounterMiddleware)
-//bloggersRouter.use(contentChecker('application/json'))
+
+blogsRouter.use(requestsCounterMiddleware)
 
 const nameValidation = body('name')
     .trim()
@@ -33,42 +28,41 @@ const youtubeUrlValidation = body('websiteUrl')
     .bail()
     .matches('^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$')
 
-const bloggerIdValidation = param('bloggerId').custom(async (bloggerId, ) => {
-    const blogger = await bloggersService.getBloggerById(bloggerId)
-    //console.log(blogger, 'blogger')
-    if (!blogger) {
-        throw new Error('such blogger doesnt exist')
+const bloggerIdValidation = param('blogId').custom(async (blogId, ) => {
+    const blog = await blogsService.getBlogById(blogId)
+    if (!blog) {
+        throw new Error('such blog doesnt exist')
     }
     return true
 })
 
-bloggersRouter.get('/', async(req: Request, res: Response) => {
+blogsRouter.get('/', async(req: Request, res: Response) => {
     const pageNumber = req.query.pageNumber? +req.query.pageNumber: 1
     const pageSize = req.query.pageSize? +req.query.pageSize: 10
     const sortBy = req.query.sortBy? req.query.sortBy.toString(): 'createdAt'
     const sortDirection = req.query.sortDirection? req.query.sortDirection.toString(): 'Desc'
-    const bloggers = await bloggersService.getBloggers(
+    const blogs = await blogsService.getBlogs(
         req.query.searchNameTerm?.toString(),
         pageNumber,
         pageSize,
         sortBy,
         sortDirection)
-    res.send(bloggers)
+    res.send(blogs)
 })
-bloggersRouter.get('/:bloggerId', async(req: Request, res: Response) => {
-    let blogger = await bloggersService.getBloggerById(req.params.bloggerId)
-    if (blogger) {
-        res.send(blogger)
+blogsRouter.get('/:blogId', async(req: Request, res: Response) => {
+    let blog = await blogsService.getBlogById(req.params.bloggerId)
+    if (blog) {
+        res.send(blog)
     } else {
         res.send(404)
     }
 })
-bloggersRouter.get('/:bloggerId/posts',
+blogsRouter.get('/:blogId/posts',
     bloggerIdValidation,
     inputValidationMiddleware,
     async(req: Request, res: Response) => {
-    let blogger = await bloggersService.getBloggerById(req.params.bloggerId)
-    if (blogger) {
+    let blog = await blogsService.getBlogById(req.params.blogId)
+    if (blog) {
         const pageNumber = req.query.pageNumber? +req.query.pageNumber: 1
         const pageSize = req.query.pageSize? +req.query.pageSize: 10
         const sortBy = req.query.sortBy? req.query.sortBy.toString(): 'createdAt'
@@ -84,19 +78,19 @@ bloggersRouter.get('/:bloggerId/posts',
         res.send(404)
     }
 })
-bloggersRouter.post('/',
+blogsRouter.post('/',
     authMiddleware,
     nameValidation,
     youtubeUrlValidation,
     inputValidationMiddleware,
     async(req: Request, res: Response) => {
-    const newBlogger = await bloggersService.createBlogger(
+    const newBlogger = await blogsService.createBlog(
         req.body.name,
         req.body.websiteUrl,
         req.body.description)
     res.status(201).send(newBlogger)
 })
-bloggersRouter.post('/:bloggerId/posts',
+blogsRouter.post('/:blogId/posts',
     authMiddleware,
     descValidation,
     titleValidation,
@@ -110,38 +104,28 @@ bloggersRouter.post('/:bloggerId/posts',
         req.body.content,
         req.params.bloggerId)
         res.status(201).send(newPost)
-    // if (newPost) {
-    //     res.status(201).send(newPost)
-    // } else {
-    //     res.status(404).json({
-    //         errorsMessages: [{
-    //             "message": "no such bloggerId!!",
-    //             "field": "bloggerId"
-    //         }]
-    //     })
-    // }
 })
-bloggersRouter.put('/:bloggerId',
+blogsRouter.put('/:blogId',
     authMiddleware,
     youtubeUrlValidation,
     nameValidation,
     inputValidationMiddleware,
     async(req: Request, res: Response) => {
-    const isUpdated: boolean = await bloggersService.updateBlogger(
-        req.params.bloggerId,
+    const isUpdated: boolean = await blogsService.updateBlog(
+        req.params.blogId,
         req.body.name,
         req.body.youtubeUrl)
     if (isUpdated) {
-        const blogger = await bloggersService.getBloggerById(req.params.bloggerId)
-        res.status(204).send(blogger)
+        const blog = await blogsService.getBlogById(req.params.blogId)
+        res.status(204).send(blog)
     } else {
         res.send(404)
     }
 })
-bloggersRouter.delete('/:bloggerId',
+blogsRouter.delete('/:blogId',
     authMiddleware,
     async(req: Request, res: Response)=>{
-    const isDeleted: boolean = await bloggersService.deleteBlogger(req.params.bloggerId)
+    const isDeleted: boolean = await blogsService.deleteBlog(req.params.blogId)
     if (isDeleted) {
         res.send(204)
     } else {

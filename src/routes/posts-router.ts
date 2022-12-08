@@ -6,7 +6,7 @@ import {postDBType} from "../types/types";
 import {postsService} from "../domain/posts-service";
 import {bearerAuthMiddleware} from "../middlewares/bearer-auth-middleware";
 import {commentsService} from "../domain/comments-service";
-import {bloggersService} from "../domain/bloggers-service";
+import {blogsService} from "../domain/blogs-service";
 
 export const postsRouter = Router({})
 
@@ -28,8 +28,8 @@ export const contentValidation = body('content')
 export const blogIdValidation = body('blogId')
     .exists({checkFalsy: true})
     .custom(async (blogId, ) => {
-        const blogger = await bloggersService.getBloggerById(blogId)
-        //console.log(blogger, 'blogger')
+        const blogger = await blogsService.getBlogById(blogId)
+
         if (!blogger) {
             throw new Error('such blogger doesnt exist')
         }

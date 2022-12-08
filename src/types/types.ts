@@ -1,6 +1,6 @@
 import {ObjectId, WithId} from 'mongodb'
 
-export type bloggerDBType = WithId<{
+export type BlogType = WithId<{
     id: string
     name: string
     websiteUrl: string
