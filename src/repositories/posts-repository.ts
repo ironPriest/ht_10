@@ -1,5 +1,5 @@
-import {postDBType, BlogType} from "../types/types";
-import {BlogModel, postsCollection} from "./db";
+import {PostType, BlogType} from "../types/types";
+import {BlogModel, PostModel} from "./db";
 import {ObjectId} from "mongodb";
 import {v4} from "uuid";
 
@@ -14,7 +14,7 @@ export const postsRepository = {
         if (bloggerId) {
             filter.bloggerId = bloggerId
         }
-        let totalCount = await postsCollection.count(filter)
+        let totalCount = await PostModel.count(filter)
         let pageCount = Math.ceil(+totalCount / pageSize)
         const sortFilter: any = {}
         switch (sortDirection) {
@@ -28,28 +28,28 @@ export const postsRepository = {
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": totalCount,
-            "items": await postsCollection
+            "items": await PostModel
                 .find(filter, {projection:{_id: 0}})
                 //.sort({"createdAt": -1})
                 .sort(sortFilter)
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
-                .toArray()
+                .lean()
         }
     },
-    async getPostById(postId: string): Promise<postDBType | null | void> {
-        return postsCollection.findOne({id: postId})
+    async getPostById(postId: string): Promise<PostType | null> {
+        return PostModel.findOne({id: postId})
     },
     async createPost(
         title: string,
         shortDescription: string,
         content: string,
-        blogId: string): Promise<postDBType | undefined> {
+        blogId: string): Promise<PostType | undefined> {
             let result = await BlogModel.find({id: blogId}).count()
             if (result === 1) {
                 const blogger: BlogType | null = await BlogModel.findOne({id: blogId})
-                let newPost: postDBType
-                await postsCollection.insertOne( newPost = {
+                let newPost: PostType
+                await PostModel.create( newPost = {
                     _id: new ObjectId(),
                     id: v4(),
                     title: title,
@@ -70,11 +70,11 @@ export const postsRepository = {
         shortDescription: string,
         content: string,
         bloggerId: string): Promise<number> {
-        let result = await postsCollection.find({id: postId}).count()
+        let result = await PostModel.find({id: postId}).count()
         if (result === 1) {
             let result = await BlogModel.find({id: bloggerId}).count()
             if (result === 1) {
-                await postsCollection.updateOne({id: postId}, {$set: {
+                await PostModel.updateOne({id: postId}, {$set: {
                     title: title,
                     shortDescription: shortDescription,
                     content: content,
@@ -89,10 +89,10 @@ export const postsRepository = {
         }
     },
     async deletePost(postId: string): Promise<boolean> {
-        let result = await postsCollection.deleteOne({id: postId})
+        let result = await PostModel.deleteOne({id: postId})
         return result.deletedCount === 1
     },
     async deleteAll() {
-        await postsCollection.deleteMany({})
+        await PostModel.deleteMany({})
     }
 }

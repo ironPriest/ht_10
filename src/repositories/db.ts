@@ -2,7 +2,7 @@ import {MongoClient} from 'mongodb'
 import mongoose from 'mongoose'
 import {
     BlogType,
-    postDBType,
+    PostType,
     UserDBType,
     CommentDBType,
     EmailConfirmationDBType,
@@ -13,14 +13,13 @@ import {
 } from '../types/types'
 
 const mongoUri = process.env.mongoURI || "mongodb://0.0.0.0:27017"
-const mongoForMongooseUri = 'mongodb+srv://andrei_shylovich:tDEU6uF8SedAaKvy@cluster0.huoctrk.mongodb.net/testDB?retryWrites=true&w=majority'
+const mongoForMongooseUri = process.env.mongoForMongooseURI || "mongodb://0.0.0.0:27017/testDB"
 
 export const client = new MongoClient(mongoUri)
 
 let dbName = "testDB"
 let db = client.db(dbName)
 
-export const postsCollection = db.collection<postDBType>('posts')
 export const usersCollection = db.collection<UserDBType>('users')
 export const commentsCollection = db.collection<CommentDBType>('comments')
 export const emailConfirmationsCollection = db.collection<EmailConfirmationDBType>('confirmations')
@@ -30,13 +29,24 @@ export const timeStampsCollection = db.collection<TimeStampType>('timeStamps')
 export const recoveryCodesCollection = db.collection<RecoveryCodeType>('recoveryCodes')
 
 const blogSchema = new mongoose.Schema<BlogType>({
-    id: String,
-    name: String,
-    websiteUrl: String,
-    description: String,
-    createdAt: Date
+    id: {type: String, required: true},
+    name: {type: String, required: true},
+    websiteUrl: {type: String, required: true},
+    description: {type: String, required: true},
+    createdAt: {type: Date, required: true}
 })
 export const BlogModel = mongoose.model('blogs', blogSchema)
+
+const postSchema = new mongoose.Schema<PostType>({
+    id: {type: String, required: true},
+    title: {type: String, required: true},
+    shortDescription: {type: String, required: true},
+    content: {type: String, required: true},
+    blogId: {type: String, required: true},
+    bloggerName: {type: String, required: true},
+    createdAt: {type: Date, required: true},
+})
+export const PostModel = mongoose.model('posts', postSchema)
 
 export async function runDb() {
     try {

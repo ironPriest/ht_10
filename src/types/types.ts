@@ -7,7 +7,7 @@ export type BlogType = WithId<{
     description: string
     createdAt: Date
 }>
-export type postDBType = WithId<{
+export type PostType = WithId<{
     id: string
     title: string
     shortDescription: string

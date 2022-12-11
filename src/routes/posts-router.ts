@@ -1,10 +1,9 @@
 import {Request, Response, Router} from "express";
 import {authMiddleware} from "../middlewares/auth-middleware";
-import {body, param} from "express-validator";
+import {body} from "express-validator";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
-import {postDBType} from "../types/types";
-import {postsService} from "../domain/posts-service";
 import {bearerAuthMiddleware} from "../middlewares/bearer-auth-middleware";
+import {postsService} from "../domain/posts-service";
 import {commentsService} from "../domain/comments-service";
 import {blogsService} from "../domain/blogs-service";
 

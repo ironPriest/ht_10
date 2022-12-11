@@ -1,5 +1,5 @@
-import {postDBType} from "../types/types";
-import {postsRepository} from "../repositories/posts-db-repository";
+import {PostType} from "../types/types";
+import {postsRepository} from "../repositories/posts-repository";
 
 export const postsService = {
     async getPosts(
@@ -15,8 +15,8 @@ export const postsService = {
                 sortBy,
                 sortDirection)
     },
-    async getPostById(postId: string): Promise<Omit<postDBType, '_id'> | null> {
-        let post: postDBType | null | void = await postsRepository.getPostById(postId)
+    async getPostById(postId: string): Promise<Omit<PostType, '_id'> | null> {
+        let post: PostType | null = await postsRepository.getPostById(postId)
         if (post) {
             return {
                 id: post.id,
@@ -32,7 +32,7 @@ export const postsService = {
         }
 
     },
-    async createPost(title: string, shortDescription: string, content: string, bloggerId: string): Promise<Omit<postDBType, "_id"> | undefined> {
+    async createPost(title: string, shortDescription: string, content: string, bloggerId: string): Promise<Omit<PostType, "_id"> | undefined> {
         const createdPost = await postsRepository.createPost(title, shortDescription, content, bloggerId)
         if (createdPost) {
             return {
