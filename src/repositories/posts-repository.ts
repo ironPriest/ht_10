@@ -1,5 +1,5 @@
 import {PostType, BlogType} from "../types/types";
-import {BlogModel, PostModel} from "./db";
+import {BlogModelClass, PostModel} from "./db";
 import {ObjectId} from "mongodb";
 import {v4} from "uuid";
 
@@ -45,9 +45,9 @@ export const postsRepository = {
         shortDescription: string,
         content: string,
         blogId: string): Promise<PostType | undefined> {
-            let result = await BlogModel.find({id: blogId}).count()
+            let result = await BlogModelClass.find({id: blogId}).count()
             if (result === 1) {
-                const blogger: BlogType | null = await BlogModel.findOne({id: blogId})
+                const blogger: BlogType | null = await BlogModelClass.findOne({id: blogId})
                 let newPost: PostType
                 await PostModel.create( newPost = {
                     _id: new ObjectId(),
@@ -72,7 +72,7 @@ export const postsRepository = {
         bloggerId: string): Promise<number> {
         let result = await PostModel.find({id: postId}).count()
         if (result === 1) {
-            let result = await BlogModel.find({id: bloggerId}).count()
+            let result = await BlogModelClass.find({id: bloggerId}).count()
             if (result === 1) {
                 await PostModel.updateOne({id: postId}, {$set: {
                     title: title,

@@ -28,16 +28,16 @@ export const deviceAuthSessionsCollection = db.collection<DeviceAuthSessionType>
 export const timeStampsCollection = db.collection<TimeStampType>('timeStamps')
 export const recoveryCodesCollection = db.collection<RecoveryCodeType>('recoveryCodes')
 
-const blogSchema = new mongoose.Schema<BlogType>({
+const BlogSchema = new mongoose.Schema<BlogType>({
     id: {type: String, required: true},
     name: {type: String, required: true},
     websiteUrl: {type: String, required: true},
     description: {type: String, required: true},
     createdAt: {type: Date, required: true}
 })
-export const BlogModel = mongoose.model('blogs', blogSchema)
+export const BlogModelClass = mongoose.model('blogs', BlogSchema)
 
-const postSchema = new mongoose.Schema<PostType>({
+const PostSchema = new mongoose.Schema<PostType>({
     id: {type: String, required: true},
     title: {type: String, required: true},
     shortDescription: {type: String, required: true},
@@ -46,7 +46,7 @@ const postSchema = new mongoose.Schema<PostType>({
     bloggerName: {type: String, required: true},
     createdAt: {type: Date, required: true},
 })
-export const PostModel = mongoose.model('posts', postSchema)
+export const PostModel = mongoose.model('posts', PostSchema)
 
 export async function runDb() {
     try {

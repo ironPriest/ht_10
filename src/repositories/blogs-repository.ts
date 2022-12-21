@@ -1,5 +1,5 @@
 import {BlogType} from "../types/types";
-import {BlogModel} from "./db";
+import {BlogModelClass} from "./db";
 
 export const blogsRepository = {
     async getBlogs(
@@ -12,7 +12,7 @@ export const blogsRepository = {
         if (searchTerm) {
             filter.name = {$regex: searchTerm, $options: 'i'}
         }
-        let totalCount = await BlogModel.count(filter)
+        let totalCount = await BlogModelClass.count(filter)
         let pageCount = Math.ceil( +totalCount / pageSize)
         const sortFilter: any = {}
         switch (sortDirection) {
@@ -21,35 +21,69 @@ export const blogsRepository = {
             case ('Desc'): sortFilter[sortBy] = -1
                 break
         }
+
+        let query = BlogModelClass.
+            find().
+            select('-_id').
+            sort(sortFilter).
+            skip((pageNumber - 1) * pageSize).
+            limit(pageSize)
+
+        if (searchTerm) {
+            //todo case insensitive
+            //query = query.where("name").regex(searchTerm)
+            query = query.find({name: {$regex: searchTerm, $options: 'i'}}).lean()
+        }
+
         return {
             "pagesCount": pageCount,
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": totalCount,
-            "items": await BlogModel
-                .find(filter, {projection:{_id: 0}})
-                .sort(sortFilter)
-                .skip((pageNumber - 1) * pageSize)
-                .limit(pageSize)
-                .lean()
+            "items": query.exec()
         }
     },
     async getBlogById(blogId: string): Promise<BlogType | null> {
-        return BlogModel.findOne({id: blogId});
+        return BlogModelClass.findOne({id: blogId}).lean()
     },
     async createBlog(newBlog: BlogType): Promise<BlogType> {
-            await BlogModel.create(newBlog)
-            return newBlog
+
+        const newBlogInstance = new BlogModelClass()
+        newBlogInstance._id = newBlog._id
+        newBlogInstance.id = newBlog.id
+        newBlogInstance.name = newBlog.name
+        newBlogInstance.websiteUrl = newBlog.websiteUrl
+        newBlogInstance.description = newBlog.description
+        newBlogInstance.createdAt = newBlog.createdAt
+
+        await newBlogInstance.save()
+        //await BlogModelClass.create(newBlog)
+        return newBlog
     },
     async updateBlog(blogId: string, name: string, websiteUrl: string): Promise<boolean> {
-        let result = await BlogModel.updateOne({id: blogId}, {$set: {name, websiteUrl}})
-        return result.matchedCount === 1
+
+        const blogInstance = await  BlogModelClass.findOne({id: blogId})
+        if (!blogInstance) return false
+
+        blogInstance.name = name
+        blogInstance.websiteUrl = websiteUrl
+
+        await blogInstance.save()
+
+        // let result = await BlogModelClass.updateOne({id: blogId}, {$set: {name, websiteUrl}})
+        return  true
     },
     async deleteBlog(blogId: string): Promise<boolean> {
-        let result = await BlogModel.deleteOne({id: blogId})
-        return result.deletedCount === 1
+
+        const blogInstance = await  BlogModelClass.findOne({id: blogId})
+        if (!blogInstance) return false
+
+        await blogInstance.deleteOne()
+
+        //let result = await BlogModelClass.deleteOne({id: blogId})
+        return true
     },
     async deleteAll() {
-        await BlogModel.deleteMany({})
+        await BlogModelClass.deleteMany({})
     }
 }
