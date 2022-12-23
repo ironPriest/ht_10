@@ -13,6 +13,8 @@ export const blogsRepository = {
             filter.name = {$regex: searchTerm, $options: 'i'}
         }
         let totalCount = await BlogModelClass.count(filter)
+        //todo instance method for case insensitive regex query
+        //let totalCount = await BlogModelClass.caseInsRegexQuery(searchTerm).count()
         let pageCount = Math.ceil( +totalCount / pageSize)
         const sortFilter: any = {}
         switch (sortDirection) {
@@ -40,7 +42,7 @@ export const blogsRepository = {
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": totalCount,
-            "items": query.exec()
+            "items": await query
         }
     },
     async getBlogById(blogId: string): Promise<BlogType | null> {
@@ -84,6 +86,6 @@ export const blogsRepository = {
         return true
     },
     async deleteAll() {
-        await BlogModelClass.deleteMany({})
+        await BlogModelClass.deleteMany()
     }
 }

@@ -34,7 +34,15 @@ const BlogSchema = new mongoose.Schema<BlogType>({
     websiteUrl: {type: String, required: true},
     description: {type: String, required: true},
     createdAt: {type: Date, required: true}
-})
+}
+//todo instance method for case insensitive regex query
+/*,
+    {methods: {
+        caseInsRegexQuery(searchTerm) {
+            return mongoose.model('blogs').find({name: {$regex: searchTerm, $options: 'i'}})
+        }
+    }
+}*/)
 export const BlogModelClass = mongoose.model('blogs', BlogSchema)
 
 const PostSchema = new mongoose.Schema<PostType>({
