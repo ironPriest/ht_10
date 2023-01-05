@@ -1,29 +1,41 @@
-import {UserDBType} from "../types/types";
-import {usersCollection} from "./db";
+import {UserType} from "../types/types";
+import {UserModelClass} from "./db";
 import {ObjectId} from "mongodb";
 
 export const usersRepository = {
-    async create(user: UserDBType) {
-        let res = await usersCollection.insertOne(user)
-        if(!res){
-            console.log('çreate user error')
-            return
-        }
-        return user
+    async create(newUser: UserType): Promise<UserType> {
+
+        const newUserInstance = new UserModelClass()
+
+        newUserInstance._id = newUser._id
+        newUserInstance.id = newUser.id
+        newUserInstance.login = newUser.login
+        newUserInstance.passwordHash = newUser.passwordHash
+        newUserInstance.email = newUser.email
+        newUserInstance.createdAt = newUser.createdAt
+
+        await newUserInstance.save()
+
+        return newUser
     },
     async newPassword(id: string, passwordHash: string) {
-        let res = await usersCollection.updateOne({id}, {$set: {passwordHash}})
-        console.log(res)
-        return res.matchedCount === 1
+
+        const userInstance = await UserModelClass.findOne({id})
+        if (!userInstance) return false
+
+        userInstance.passwordHash = passwordHash
+        await userInstance.save()
+
+        return true
     },
     async findByLoginOrEmail(loginOrEmail: string) {
-        return await usersCollection.findOne({ $or: [{email: loginOrEmail}, {login: loginOrEmail}]})
+        return UserModelClass.findOne({ $or: [{email: loginOrEmail}, {login: loginOrEmail}]}).lean()
     },
     async findById(id: ObjectId) {
-        return await usersCollection.findOne({_id: id})
+        return UserModelClass.findOne({_id: id}).lean()
     },
-    async findByEmail(email: string): Promise<UserDBType | null> {
-        return await usersCollection.findOne({email: email})
+    async findByEmail(email: string): Promise<UserType | null> {
+        return UserModelClass.findOne({email: email}).lean()
     },
     async getUsers(
             searchLoginTerm: string | undefined,
@@ -40,7 +52,7 @@ export const usersRepository = {
         if (searchEmailTerm) {
             emailFilter.email = {$regex: searchEmailTerm, $options: 'i'}
         }
-        let totalCount = await usersCollection.count({$or:[loginFilter, emailFilter]})
+        let totalCount = await UserModelClass.count({$or:[loginFilter, emailFilter]})
         let pageCount = Math.ceil(+totalCount / pageSize)
         const sortFilter: any = {}
         switch (sortDirection) {
@@ -49,24 +61,32 @@ export const usersRepository = {
             case ('Desc'): sortFilter[sortBy] = -1
                 break
         }
+
+        let query = UserModelClass.
+            find({$or:[loginFilter, emailFilter]}).
+            select('-_id -passwordHash').
+            sort(sortFilter).
+            skip((pageNumber - 1) * pageSize).
+            limit(pageSize)
+
         return {
             "pagesCount": pageCount,
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": totalCount,
-            "items": await usersCollection
-                .find({$or:[loginFilter, emailFilter]}, {projection: {_id: 0, passwordHash: 0}})
-                .sort(sortFilter)
-                .skip((pageNumber - 1) * pageSize)
-                .limit(pageSize)
-                .toArray()
+            "items": await query
         }
     },
     async delete(id: string) {
-        let result = await usersCollection.deleteOne({id: id})
-        return result.deletedCount === 1
+
+        const userInstance = await UserModelClass.findOne({id})
+        if (!userInstance) return false
+
+        await userInstance.deleteOne()
+        return true
+
     },
     async deleteAll() {
-        await usersCollection.deleteMany({})
+        await UserModelClass.deleteMany()
     }
 }

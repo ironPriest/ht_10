@@ -3,15 +3,15 @@ import {postsRepository} from "../repositories/posts-repository";
 
 export const postsService = {
     async getPosts(
+        blogId: string | null,
         pageNumber: number,
         pageSize: number,
-        bloggerId: string | null | undefined,
         sortBy: string,
         sortDirection: string) {
             return await postsRepository.getPosts(
+                blogId,
                 pageNumber,
                 pageSize,
-                bloggerId,
                 sortBy,
                 sortDirection)
     },
@@ -24,7 +24,7 @@ export const postsService = {
                 shortDescription: post.shortDescription,
                 content: post.content,
                 blogId: post.blogId,
-                bloggerName: post.bloggerName,
+                blogName: post.blogName,
                 createdAt: post.createdAt
             }
         } else {
@@ -41,7 +41,7 @@ export const postsService = {
                 shortDescription: createdPost.shortDescription,
                 content: createdPost.content,
                 blogId: createdPost.blogId,
-                bloggerName: createdPost.bloggerName,
+                blogName: createdPost.blogName,
                 createdAt: createdPost.createdAt
             }
         } else {
@@ -49,8 +49,8 @@ export const postsService = {
         }
 
     },
-    async updatePost(postId: string, title: string, shortDescription: string, content: string, bloggerId: string): Promise<number> {
-        return postsRepository.updatePost(postId, title, shortDescription, content, bloggerId)
+    async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
+        return postsRepository.updatePost(postId, title, shortDescription, content, blogId)
     },
     async deletePost(postId: string): Promise<boolean> {
         return postsRepository.deletePost(postId)

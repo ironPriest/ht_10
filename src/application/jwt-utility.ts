@@ -1,14 +1,14 @@
-import {UserDBType} from "../types/types";
+import {UserType} from "../types/types";
 import jwt from 'jsonwebtoken'
 import {settings} from "../types/settings";
 import {ObjectId} from "mongodb";
 import {blacktockensRepository} from "../repositories/blacktockens-repository";
 
 export const jwtUtility = {
-    async createJWT(user: UserDBType) {
+    async createJWT(user: UserType) {
         return jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: '1h'})
     },
-    async createRefreshToken(user: UserDBType, deviceId: string) {
+    async createRefreshToken(user: UserType, deviceId: string) {
         return jwt.sign({userId: user._id, deviceId: deviceId}, settings.JWT_SECRET, {expiresIn: '1h'})
     },
     async getUserIdByToken(token: string) {

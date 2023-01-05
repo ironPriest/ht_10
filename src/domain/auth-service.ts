@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import {usersRepository} from "../repositories/users-repository";
-import {EmailConfirmationDBType, UserDBType} from "../types/types";
+import {EmailConfirmationDBType, UserType} from "../types/types";
 import {ObjectId} from "mongodb";
 import {v4} from "uuid";
 import add from "date-fns/add"
@@ -11,7 +11,7 @@ import {recoveryCodesRepository} from "../repositories/recovery-codes-repository
 export const authService = {
     async createUser(login: string, password: string, email: string) {
         const passwordHash = await this._generateHash(password)
-        const user: UserDBType = {
+        const user: UserType = {
             _id: new ObjectId(),
             id: v4(),
             login,
@@ -44,7 +44,7 @@ export const authService = {
         }
     },
     async confirmationResend(email: string) {
-        let user: UserDBType | null = await usersRepository.findByEmail(email)
+        let user: UserType | null = await usersRepository.findByEmail(email)
         if (user) {
             let userId = user.id
             let newConfirmationCode = v4()

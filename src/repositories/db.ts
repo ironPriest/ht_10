@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import {
     BlogType,
     PostType,
-    UserDBType,
+    UserType,
     CommentDBType,
     EmailConfirmationDBType,
     TokenDBType,
@@ -20,7 +20,7 @@ export const client = new MongoClient(mongoUri)
 let dbName = "testDB"
 let db = client.db(dbName)
 
-export const usersCollection = db.collection<UserDBType>('users')
+//export const usersCollection = db.collection<UserDBType>('users')
 export const commentsCollection = db.collection<CommentDBType>('comments')
 export const emailConfirmationsCollection = db.collection<EmailConfirmationDBType>('confirmations')
 export const blacktockensCollection = db.collection<TokenDBType>('tokenBlackList')
@@ -51,10 +51,19 @@ const PostSchema = new mongoose.Schema<PostType>({
     shortDescription: {type: String, required: true},
     content: {type: String, required: true},
     blogId: {type: String, required: true},
-    bloggerName: {type: String, required: true},
+    blogName: {type: String, required: true},
     createdAt: {type: Date, required: true},
 })
-export const PostModel = mongoose.model('posts', PostSchema)
+export const PostModelClass = mongoose.model('posts', PostSchema)
+
+const UserSchema = new mongoose.Schema<UserType>({
+    id: {type: String, required: true},
+    login: {type: String, required: true},
+    passwordHash: {type: String, required: true},
+    email: {type: String, required: true},
+    createdAt: {type: Date, required: true}
+})
+export const UserModelClass = mongoose.model('users', UserSchema)
 
 export async function runDb() {
     try {

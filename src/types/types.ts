@@ -13,10 +13,10 @@ export type PostType = WithId<{
     shortDescription: string
     content: string
     blogId: string
-    bloggerName: string | undefined
+    blogName: string | undefined
     createdAt: Date
 }>
-export type UserDBType = WithId<{
+export type UserType = WithId<{
     id: string
     login: string
     passwordHash: string

@@ -12,9 +12,10 @@ export const blogsRepository = {
         if (searchTerm) {
             filter.name = {$regex: searchTerm, $options: 'i'}
         }
-        let totalCount = await BlogModelClass.count(filter)
+
         //todo instance method for case insensitive regex query
         //let totalCount = await BlogModelClass.caseInsRegexQuery(searchTerm).count()
+        let totalCount = await BlogModelClass.count(filter)
         let pageCount = Math.ceil( +totalCount / pageSize)
         const sortFilter: any = {}
         switch (sortDirection) {

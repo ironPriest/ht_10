@@ -68,9 +68,9 @@ blogsRouter.get('/:blogId/posts',
         const sortBy = req.query.sortBy? req.query.sortBy.toString(): 'createdAt'
         const sortDirection = req.query.sortDirection? req.query.sortDirection.toString(): 'Desc'
         const posts = await postsService.getPosts(
+            req.params.blogId,
             pageNumber,
             pageSize,
-            req.params.bloggerId,
             sortBy,
             sortDirection)
         res.send(posts)

@@ -6,6 +6,7 @@ import {bearerAuthMiddleware} from "../middlewares/bearer-auth-middleware";
 import {postsService} from "../domain/posts-service";
 import {commentsService} from "../domain/comments-service";
 import {blogsService} from "../domain/blogs-service";
+import {PostModelClass} from "../repositories/db";
 
 export const postsRouter = Router({})
 
@@ -47,9 +48,9 @@ postsRouter.get('/', async(req: Request, res: Response ) => {
     const sortBy = req.query.sortBy? req.query.sortBy.toString(): 'createdAt'
     const sortDirection = req.query.sortDirection? req.query.sortDirection.toString(): 'Desc'
     const posts = await postsService.getPosts(
+        null,
         pageNumber,
         pageSize,
-        null,
         sortBy,
         sortDirection)
     res.send(posts)
@@ -95,25 +96,21 @@ postsRouter.put('/:postId',
     blogIdValidation,
     inputValidationMiddleware,
     async(req: Request, res: Response) => {
-    const isUpdated: number = await postsService.updatePost(
+
+    const postInstance = await PostModelClass.findOne({id: req.params.postId})
+    if (!postInstance) return res.sendStatus(404)
+
+    const updatedPostInstance = await postsService.updatePost(
         req.params.postId,
         req.body.title,
         req.body.shortDescription,
         req.body.content,
-        req.body.bloggerId)
-    if (isUpdated === 2) {
-        const post = await postsService.getPostById(req.params.postId)
-        res.status(204).send(post)
-    } else  if (isUpdated === 1) {
-        res.status(400).json({
-            errorsMessages: [{
-                "message": "no such bloggerId",
-                "field": "bloggerId"
-            }]
-        })
-    } else {
-        res.send(404)
-    }
+        req.body.blogId
+    )
+
+    if (!updatedPostInstance) return res.sendStatus(400)
+
+    return res.sendStatus(204)
 })
 postsRouter.delete('/:postId',
     authMiddleware,
