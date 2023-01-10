@@ -1,13 +1,13 @@
 import {ObjectId} from "mongodb";
 import {commentsRepository} from "../repositories/comments-repository";
 import {usersRepository} from "../repositories/users-repository";
-import {CommentDBType, UserType} from "../types/types";
+import {CommentType, UserType} from "../types/types";
 import {v4} from "uuid";
 
 export const commentsService = {
-    async create(content: string, userId: ObjectId, postId: string): Promise<Omit<CommentDBType, "_id" | "postId">> {
+    async create(content: string, userId: ObjectId, postId: string): Promise<Omit<CommentType, "_id" | "postId">> {
         const user: UserType | void | null = await usersRepository.findById(userId)
-        let comment: CommentDBType = {
+        let comment: CommentType = {
             _id: new ObjectId(),
             id: v4(),
             content: content,

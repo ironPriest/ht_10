@@ -4,7 +4,7 @@ import {
     BlogType,
     PostType,
     UserType,
-    CommentDBType,
+    CommentType,
     EmailConfirmationDBType,
     TokenDBType,
     DeviceAuthSessionType,
@@ -20,8 +20,7 @@ export const client = new MongoClient(mongoUri)
 let dbName = "testDB"
 let db = client.db(dbName)
 
-//export const usersCollection = db.collection<UserDBType>('users')
-export const commentsCollection = db.collection<CommentDBType>('comments')
+//export const commentsCollection = db.collection<CommentDBType>('comments')
 export const emailConfirmationsCollection = db.collection<EmailConfirmationDBType>('confirmations')
 export const blacktockensCollection = db.collection<TokenDBType>('tokenBlackList')
 export const deviceAuthSessionsCollection = db.collection<DeviceAuthSessionType>('deviceAuthSessions')
@@ -64,6 +63,16 @@ const UserSchema = new mongoose.Schema<UserType>({
     createdAt: {type: Date, required: true}
 })
 export const UserModelClass = mongoose.model('users', UserSchema)
+
+const CommentSchema = new mongoose.Schema<CommentType>({
+    id: {type: String, required: true},
+    content: {type: String, required: true},
+    userId: {type: String, required: true},
+    userLogin: {type: String, required: true},
+    createdAt: {type: Date, required: true},
+    postId: {type: String, required: true}
+})
+export const CommentModelClass = mongoose.model('comments', CommentSchema)
 
 export async function runDb() {
     try {

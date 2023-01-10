@@ -1,10 +1,20 @@
-import {CommentDBType} from "../types/types";
-import {commentsCollection} from "./db";
+import {CommentType} from "../types/types";
+import {CommentModelClass} from "./db";
 
 export const commentsRepository = {
-    async create(comment: CommentDBType): Promise<CommentDBType> {
-        await commentsCollection.insertOne(comment)
-        return comment
+    async create(newComment: CommentType): Promise<CommentType> {
+
+        const newCommentInstance = new CommentModelClass()
+        newCommentInstance.id = newComment.id
+        newCommentInstance.content = newComment.content
+        newCommentInstance.userId = newComment.userId
+        newCommentInstance.userLogin = newComment.userLogin
+        newCommentInstance.createdAt = newComment.createdAt
+        newCommentInstance.postId = newComment.postId
+
+        await newCommentInstance.save()
+
+        return newComment
     },
     async findPostComments(
             postId: string,
@@ -12,7 +22,7 @@ export const commentsRepository = {
             pageSize: number,
             sortBy: string,
             sortDirection: string) {
-        let totalCount = await commentsCollection.countDocuments({postId: postId})
+        let totalCount = await CommentModelClass.count({postId})
         let pageCount = Math.ceil(+totalCount / pageSize)
         const sortFilter: any = {}
         switch (sortDirection) {
@@ -21,31 +31,50 @@ export const commentsRepository = {
             case ('Desc'): sortFilter[sortBy] = -1
                 break
         }
+
+        let query = CommentModelClass.
+            find().
+            where('postId').equals(postId).
+            select('-_id -postId').
+            sort(sortFilter).
+            skip((pageNumber - 1) * pageSize).
+            limit(pageSize)
+
         return {
             "pagesCount": pageCount,
             "page": pageNumber,
             "pageSize": pageSize,
             "totalCount": totalCount,
-            "items": await commentsCollection
-                .find( {postId: postId}, {projection:{_id: 0, postId: 0}})
-                .sort(sortFilter)
-                .skip((pageNumber - 1) * pageSize)
-                .limit(pageSize)
-                .toArray()
+            "items": await query
         }
     },
-    async findCommentById(id: string) {
-        return await commentsCollection.findOne({id: id}, {projection: {_id: 0, postId: 0} })
+    async findCommentById(id: string): Promise<Omit<CommentType, '_id, postId'> | null> {
+        //return CommentModelClass.findOne({id: id}, {projection: {_id: 0, postId: 0} })
+        return CommentModelClass.
+            findOne({id}).
+            select('-_id -postId')
     },
-    async updateComment(id: string, content: string) {
-        let result = await commentsCollection.updateOne({id: id}, {$set: {content: content}})
-        return result.matchedCount === 1
+    async updateComment(id: string, content: string): Promise<boolean> {
+
+        const commentInstance = await CommentModelClass.findOne({id})
+        if (!commentInstance) return false
+
+        commentInstance.content = content
+
+        await commentInstance.save()
+
+        return true
     },
     async delete(id: string) {
-        let result = await commentsCollection.deleteOne({id: id})
-        return result.deletedCount === 1
+
+        const commentInstance = await CommentModelClass.findOne({id})
+        if (!commentInstance) return false
+
+        await commentInstance.deleteOne()
+
+        return true
     },
     async deleteAll() {
-        await commentsCollection.deleteMany({})
+        await CommentModelClass.deleteMany()
     }
 }

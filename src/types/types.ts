@@ -13,7 +13,7 @@ export type PostType = WithId<{
     shortDescription: string
     content: string
     blogId: string
-    blogName: string | undefined
+    blogName: string
     createdAt: Date
 }>
 export type UserType = WithId<{
@@ -23,19 +23,19 @@ export type UserType = WithId<{
     email: string
     createdAt: Date
 }>
+export type CommentType = WithId<{
+    id: string
+    content: string
+    userId: string
+    userLogin: string
+    createdAt: Date
+    postId: string
+}>
 export type EmailConfirmationDBType = WithId<{
     userId: string
     confirmationCode: string
     expirationDate: Date
     isConfirmed: boolean
-}>
-export type CommentDBType = WithId<{
-    id: string
-    content: string
-    userId: string | ObjectId
-    userLogin: string
-    createdAt: Date
-    postId: string
 }>
 export type TokenDBType = WithId<{
     token: string
