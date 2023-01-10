@@ -1,4 +1,4 @@
-import {MongoClient} from 'mongodb'
+import {MongoClient, ObjectId} from 'mongodb'
 import mongoose from 'mongoose'
 import {
     BlogType,
@@ -20,7 +20,7 @@ export const client = new MongoClient(mongoUri)
 let dbName = "testDB"
 let db = client.db(dbName)
 
-export const deviceAuthSessionsCollection = db.collection<DeviceAuthSessionType>('deviceAuthSessions')
+//export const DeviceAuthSessionModelClass = db.collection<DeviceAuthSessionType>('deviceAuthSessions')
 export const timeStampsCollection = db.collection<TimeStampType>('timeStamps')
 export const recoveryCodesCollection = db.collection<RecoveryCodeType>('recoveryCodes')
 
@@ -83,6 +83,16 @@ const BlackTokenSchema = new mongoose.Schema<TokenType>({
     token: {type: String, required: true}
 })
 export const BlackTokenModelClass = mongoose.model('blackTokens', BlackTokenSchema)
+
+const DeviceAuthSessionSchema = new mongoose.Schema<DeviceAuthSessionType>({
+    lastActiveDate: {type: Date, required: true},
+    deviceId: {type: String, required: true},
+    ip: {type: String, required: true},
+    title: {type: String, required: true},
+    userId: {type: ObjectId, required: true},
+    rtExpDate: {type: Date, required: true}
+})
+export const DeviceAuthSessionModelClass = mongoose.model('deviceAuthSessions', DeviceAuthSessionSchema)
 
 export async function runDb() {
     try {
