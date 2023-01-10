@@ -37,7 +37,7 @@ export type EmailConfirmationType = WithId<{
     expirationDate: Date
     isConfirmed: boolean
 }>
-export type TokenDBType = WithId<{
+export type TokenType = WithId<{
     token: string
 }>
 export type DeviceAuthSessionType = WithId<{

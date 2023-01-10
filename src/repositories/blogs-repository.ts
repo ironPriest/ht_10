@@ -34,7 +34,6 @@ export const blogsRepository = {
 
         if (searchTerm) {
             //todo case insensitive
-            //query = query.where("name").regex(searchTerm)
             query = query.find({name: {$regex: searchTerm, $options: 'i'}}).lean()
         }
 

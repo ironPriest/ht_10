@@ -7,7 +7,7 @@ import {usersRepository} from "../repositories/users-repository";
 import {deviceAuthSessionsRepository} from "../repositories/device-auth-sessions-repository";
 import {commentsRepository} from "../repositories/comments-repository";
 import {emailConfirmationRepository} from "../repositories/emailconfirmation-repository";
-import {blacktockensRepository} from "../repositories/blacktockens-repository";
+import {blackTokensRepository} from "../repositories/blacktockens-repository";
 import {timeStampsRepository} from "../repositories/time-stamps-repository";
 import {recoveryCodesRepository} from "../repositories/recovery-codes-repository";
 
@@ -19,7 +19,7 @@ testingRouter.delete('/all-data', async (req: Request, res: Response) => {
     await usersRepository.deleteAll()
     await commentsRepository.deleteAll()
     await emailConfirmationRepository.deleteAll()
-    await blacktockensRepository.deleteAll()
+    await blackTokensRepository.deleteAll()
     await deviceAuthSessionsRepository.deleteAll()
     await timeStampsRepository.deleteAll()
     await recoveryCodesRepository.deleteAll()

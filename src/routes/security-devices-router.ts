@@ -2,8 +2,8 @@ import {Request, Response, Router} from "express";
 import {deviceAuthSessionsService} from "../domain/device-auth-sessions-service";
 import {jwtUtility} from "../application/jwt-utility";
 import {deviceAuthSessionsRepository} from "../repositories/device-auth-sessions-repository";
-import {TokenDBType} from "../types/types";
-import {blacktockensRepository} from "../repositories/blacktockens-repository";
+import {TokenType} from "../types/types";
+import {blackTokensRepository} from "../repositories/blacktockens-repository";
 import {Logger} from "mongodb";
 
 export const securityDevicesRouter = Router({})
@@ -13,7 +13,7 @@ securityDevicesRouter.get('/', async (req: Request, res: Response) => {
     const token = req.cookies.refreshToken
     if (!token) return res.sendStatus(401)
 
-    const blackToken: TokenDBType | null = await blacktockensRepository.check(token)
+    const blackToken: TokenType | null = await blackTokensRepository.check(token)
     if (blackToken) return res.sendStatus(401)
 
     console.log('blackToken: ', blackToken)

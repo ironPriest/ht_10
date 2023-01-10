@@ -6,7 +6,7 @@ import {
     UserType,
     CommentType,
     EmailConfirmationType,
-    TokenDBType,
+    TokenType,
     DeviceAuthSessionType,
     TimeStampType,
     RecoveryCodeType
@@ -20,8 +20,6 @@ export const client = new MongoClient(mongoUri)
 let dbName = "testDB"
 let db = client.db(dbName)
 
-//export const emailConfirmationsCollection = db.collection<EmailConfirmationDBType>('confirmations')
-export const blacktockensCollection = db.collection<TokenDBType>('tokenBlackList')
 export const deviceAuthSessionsCollection = db.collection<DeviceAuthSessionType>('deviceAuthSessions')
 export const timeStampsCollection = db.collection<TimeStampType>('timeStamps')
 export const recoveryCodesCollection = db.collection<RecoveryCodeType>('recoveryCodes')
@@ -80,6 +78,11 @@ const EmailConfirmationSchema = new mongoose.Schema<EmailConfirmationType>({
     isConfirmed: {type: Boolean, required: true}
 })
 export const EmailConfirmationModelClass = mongoose.model('emailConfirmations', EmailConfirmationSchema)
+
+const BlackTokenSchema = new mongoose.Schema<TokenType>({
+    token: {type: String, required: true}
+})
+export const BlackTokenModelClass = mongoose.model('blackTokens', BlackTokenSchema)
 
 export async function runDb() {
     try {

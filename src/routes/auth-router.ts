@@ -1,10 +1,10 @@
 import {Request, Response, Router} from "express";
-import {DeviceAuthSessionType, RecoveryCodeType, TokenDBType} from "../types/types";
+import {DeviceAuthSessionType, RecoveryCodeType, TokenType} from "../types/types";
 import {authService} from "../domain/auth-service";
 import {jwtUtility} from "../application/jwt-utility";
 import {usersService} from "../domain/users-service";
 import {emailConfirmationRepository} from "../repositories/emailconfirmation-repository";
-import {blacktockensRepository} from "../repositories/blacktockens-repository";
+import {blackTokensRepository} from "../repositories/blacktockens-repository";
 import {deviceAuthSessionsService} from "../domain/device-auth-sessions-service";
 import {inputValidationMiddleware, rateLimiter} from "../middlewares/input-validation-middleware";
 import {body, header} from "express-validator";
@@ -116,7 +116,7 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
 
         const reqRefreshToken = req.cookies.refreshToken
         // token check
-        const blackToken: TokenDBType | null = await blacktockensRepository.check(reqRefreshToken)
+        const blackToken: TokenType | null = await blackTokensRepository.check(reqRefreshToken)
         if (blackToken) {
             return res.sendStatus(401)
         }
@@ -223,7 +223,7 @@ authRouter.post('/logout',async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken
         if (!refreshToken) return res.sendStatus(401)
 
-        const blackToken: TokenDBType | null = await blacktockensRepository.check(refreshToken)
+        const blackToken: TokenType | null = await blackTokensRepository.check(refreshToken)
         if (blackToken) return res.sendStatus(401)
 
         const userId = await jwtUtility.getUserIdByToken(refreshToken)
