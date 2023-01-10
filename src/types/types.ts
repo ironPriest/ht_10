@@ -31,7 +31,7 @@ export type CommentType = WithId<{
     createdAt: Date
     postId: string
 }>
-export type EmailConfirmationDBType = WithId<{
+export type EmailConfirmationType = WithId<{
     userId: string
     confirmationCode: string
     expirationDate: Date

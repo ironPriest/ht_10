@@ -5,7 +5,7 @@ import {
     PostType,
     UserType,
     CommentType,
-    EmailConfirmationDBType,
+    EmailConfirmationType,
     TokenDBType,
     DeviceAuthSessionType,
     TimeStampType,
@@ -20,8 +20,7 @@ export const client = new MongoClient(mongoUri)
 let dbName = "testDB"
 let db = client.db(dbName)
 
-//export const commentsCollection = db.collection<CommentDBType>('comments')
-export const emailConfirmationsCollection = db.collection<EmailConfirmationDBType>('confirmations')
+//export const emailConfirmationsCollection = db.collection<EmailConfirmationDBType>('confirmations')
 export const blacktockensCollection = db.collection<TokenDBType>('tokenBlackList')
 export const deviceAuthSessionsCollection = db.collection<DeviceAuthSessionType>('deviceAuthSessions')
 export const timeStampsCollection = db.collection<TimeStampType>('timeStamps')
@@ -73,6 +72,14 @@ const CommentSchema = new mongoose.Schema<CommentType>({
     postId: {type: String, required: true}
 })
 export const CommentModelClass = mongoose.model('comments', CommentSchema)
+
+const EmailConfirmationSchema = new mongoose.Schema<EmailConfirmationType>({
+    userId: {type: String, required: true},
+    confirmationCode: {type: String, required: true},
+    expirationDate: {type: Date, required: true},
+    isConfirmed: {type: Boolean, required: true}
+})
+export const EmailConfirmationModelClass = mongoose.model('emailConfirmations', EmailConfirmationSchema)
 
 export async function runDb() {
     try {

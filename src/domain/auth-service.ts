@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import {usersRepository} from "../repositories/users-repository";
-import {EmailConfirmationDBType, UserType} from "../types/types";
+import {EmailConfirmationType, UserType} from "../types/types";
 import {ObjectId} from "mongodb";
 import {v4} from "uuid";
 import add from "date-fns/add"
@@ -19,7 +19,7 @@ export const authService = {
             email,
             createdAt: new Date()
         }
-        const emailConformation: EmailConfirmationDBType = {
+        const emailConformation: EmailConfirmationType = {
             _id: new ObjectId(),
             userId: user.id,
             confirmationCode: v4(),
@@ -30,7 +30,8 @@ export const authService = {
             isConfirmed: false
         }
         const creationResult = await usersRepository.create(user)
-        await emailConfirmationRepository.create(emailConformation)
+        const confirmationResult = await emailConfirmationRepository.create(emailConformation)
+        if (!confirmationResult) return null
         await emailService.register(
             user.email,
             'subject',

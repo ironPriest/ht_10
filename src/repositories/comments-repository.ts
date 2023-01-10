@@ -49,7 +49,7 @@ export const commentsRepository = {
         }
     },
     async findCommentById(id: string): Promise<Omit<CommentType, '_id, postId'> | null> {
-        //return CommentModelClass.findOne({id: id}, {projection: {_id: 0, postId: 0} })
+
         return CommentModelClass.
             findOne({id}).
             select('-_id -postId')

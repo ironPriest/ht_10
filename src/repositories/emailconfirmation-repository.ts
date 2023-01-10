@@ -1,24 +1,49 @@
-import {EmailConfirmationDBType} from "../types/types";
-import {emailConfirmationsCollection} from "./db";
+import {BlogType, EmailConfirmationType} from "../types/types";
+import {EmailConfirmationModelClass} from "./db";
 
 export const emailConfirmationRepository = {
-    async create(emailConformation: EmailConfirmationDBType) {
-        await emailConfirmationsCollection.insertOne(emailConformation)
-    },
-    async update(userId: string, newConfirmationCode: string) {
-        await emailConfirmationsCollection.updateOne({userId: userId}, {$set: {confirmationCode: newConfirmationCode}})
+    async create(newEmailConformation: EmailConfirmationType): Promise<boolean> {
 
+        const newEmailConfirmationInstance = new EmailConfirmationModelClass()
+        newEmailConfirmationInstance._id = newEmailConformation._id
+        newEmailConfirmationInstance.userId = newEmailConformation.userId
+        newEmailConfirmationInstance.confirmationCode = newEmailConformation.confirmationCode
+        newEmailConfirmationInstance.expirationDate = newEmailConformation.expirationDate
+        newEmailConfirmationInstance.isConfirmed = newEmailConformation.isConfirmed
+
+        await newEmailConfirmationInstance.save()
+
+        return true
     },
-    async updateStatus(userId: string) {
-        await emailConfirmationsCollection.updateOne({userId: userId}, {$set:{isConfirmed: true}})
+    async update(userId: string, newConfirmationCode: string): Promise<boolean> {
+
+        const emailConfirmationInstance = await EmailConfirmationModelClass.findOne({userId})
+        if (!emailConfirmationInstance) return false
+
+        emailConfirmationInstance.confirmationCode = newConfirmationCode
+
+        await emailConfirmationInstance.save()
+
+        return true
     },
-    async findByCode(code: string) {
-        return await emailConfirmationsCollection.findOne({confirmationCode: code})
+    async updateStatus(userId: string): Promise<boolean> {
+
+        const emailConfirmationInstance = await EmailConfirmationModelClass.findOne({userId})
+        if (!emailConfirmationInstance) return false
+
+        emailConfirmationInstance.isConfirmed = true
+
+        await emailConfirmationInstance.save()
+
+        return true
     },
-    async findByUserId(userId: string) {
-        return await emailConfirmationsCollection.findOne({userId: userId})
+    async findByCode(code: string): Promise<EmailConfirmationType | null> {
+        return EmailConfirmationModelClass.findOne({confirmationCode: code}).lean()
+    },
+    async findByUserId(userId: string): Promise<EmailConfirmationType | null> {
+        return EmailConfirmationModelClass.findOne({userId}).lean()
     },
     async deleteAll() {
-        await emailConfirmationsCollection.deleteMany({})
+        await EmailConfirmationModelClass.deleteMany()
     }
 }
