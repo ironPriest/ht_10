@@ -20,8 +20,7 @@ export const client = new MongoClient(mongoUri)
 let dbName = "testDB"
 let db = client.db(dbName)
 
-//export const DeviceAuthSessionModelClass = db.collection<DeviceAuthSessionType>('deviceAuthSessions')
-export const timeStampsCollection = db.collection<TimeStampType>('timeStamps')
+//export const TimeStampModelClass = db.collection<TimeStampType>('timeStamps')
 export const recoveryCodesCollection = db.collection<RecoveryCodeType>('recoveryCodes')
 
 const BlogSchema = new mongoose.Schema<BlogType>({
@@ -93,6 +92,13 @@ const DeviceAuthSessionSchema = new mongoose.Schema<DeviceAuthSessionType>({
     rtExpDate: {type: Date, required: true}
 })
 export const DeviceAuthSessionModelClass = mongoose.model('deviceAuthSessions', DeviceAuthSessionSchema)
+
+const TimeStampSchema = new mongoose.Schema<TimeStampType>({
+    route: {type: String, required: true},
+    ip: {type: String, required: true},
+    timeStamp: {type: Date, required: true}
+})
+export const TimeStampModelClass = mongoose.model('timeStamps', TimeStampSchema)
 
 export async function runDb() {
     try {
