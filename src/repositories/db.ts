@@ -20,8 +20,7 @@ export const client = new MongoClient(mongoUri)
 let dbName = "testDB"
 let db = client.db(dbName)
 
-//export const TimeStampModelClass = db.collection<TimeStampType>('timeStamps')
-export const recoveryCodesCollection = db.collection<RecoveryCodeType>('recoveryCodes')
+//export const RecoveryCodeModelClass = db.collection<RecoveryCodeType>('recoveryCodes')
 
 const BlogSchema = new mongoose.Schema<BlogType>({
     id: {type: String, required: true},
@@ -99,6 +98,12 @@ const TimeStampSchema = new mongoose.Schema<TimeStampType>({
     timeStamp: {type: Date, required: true}
 })
 export const TimeStampModelClass = mongoose.model('timeStamps', TimeStampSchema)
+
+const RecoveryCodeSchema = new mongoose.Schema<RecoveryCodeType>({
+    email: {type: String, required: true},
+    recoveryCode: {type: String, required: true}
+})
+export const RecoveryCodeModelClass = mongoose.model('recoveryCodes', RecoveryCodeSchema)
 
 export async function runDb() {
     try {
